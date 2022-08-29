@@ -31,6 +31,7 @@ const routingControllersOptions: RoutingControllersOptions = {
 const app = createExpressServer(routingControllersOptions);
 
 app.use("/public", express.static("./public"));
+app.get("/ping", (req: any, res: any) => res.json({ message: "pong" }));
 
 // Parse class-validator classes into JSON Schema:
 const schemas = validationMetadatasToSchemas({
