@@ -60,8 +60,10 @@ const spec = routingControllersToSpec(storage, routingControllersOptions, {
 
 app.use("/swagger", swaggerUiExpress.serve, swaggerUiExpress.setup(spec));
 
-const server = app.listen(3000, () =>
+const port = process.env.PORT || 3001;
+
+const server = app.listen(port, () =>
   console.log(`
-🚀 Server ready at: http://localhost:3000
+🚀 Server ready at: http://localhost:${port}
 ⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`)
 );
