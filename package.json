@@ -7,7 +7,7 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev src/server.ts",
     "migrate": "npx prisma migrate dev",
-    "afterDeploy": "npm install && npm run build && npm run migrate"
+    "afterDeploy": "npm install && npm run build && npx prisma db push"
   },
   "dependencies": {
     "@prisma/client": "4.2.1",
