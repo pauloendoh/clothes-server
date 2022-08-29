@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
     "dev": "ts-node-dev src/server.ts",
-    "migrate": "prisma migrate dev"
+    "migrate": "prisma migrate dev",
+    "afterDeploy": "npm install && npm run build && npm run migrate && npm run start"
   },
   "dependencies": {
     "@prisma/client": "4.2.1",
