@@ -1,8 +1,10 @@
-import { config } from "dotenv";
-import { BadRequestError } from "routing-controllers";
+import { unlink } from "fs";
+import { BadRequestError, ForbiddenError } from "routing-controllers";
+import { getSrcPath } from "../../getSrcPath";
+import { getPublicUploadsPath } from "../../utils/getPublicUploadsPath";
 import { urls } from "../../utils/urls";
 import { ClothingRepository } from "./ClothingRepository";
-config();
+import { ClothingPutDto } from "./types/ClothingPutDto";
 
 export class ClothingService {
   constructor(private clothingRepo = new ClothingRepository()) {}
@@ -19,15 +21,44 @@ export class ClothingService {
     return this.clothingRepo.createClothing(userId, imgUrl);
   };
 
+  async updateClothing(
+    userId: number,
+    clothingId: number,
+    payload: ClothingPutDto
+  ) {
+    const isAllowed = await this.clothingRepo.clothingBelongsToUser(
+      clothingId,
+      userId
+    );
+    if (!isAllowed)
+      throw new ForbiddenError(
+        "Clothing does not exist or user is not allowed."
+      );
+
+    return this.clothingRepo.updateClothing(clothingId, payload);
+  }
+
   async deleteClothing(userId: number, clothingId: number) {
+    const found = await this.clothingRepo.findClothing(clothingId);
+
     const deleteResult = await this.clothingRepo.deleteClothing(
       userId,
       clothingId
     );
-    if (deleteResult.count === 0)
+    if (!found || deleteResult.count === 0)
       throw new BadRequestError(
         "Clothing not found or user does not have access."
       );
+
+    const srcPath = getSrcPath();
+
+    if (process.env.IS_DISK_STORAGE === "true") {
+      const splits = found.imgUrl.split("/");
+      const imgName = splits[splits.length - 1];
+      unlink(getPublicUploadsPath() + imgName, (err) => {
+        console.log(err);
+      });
+    }
 
     return deleteResult;
   }

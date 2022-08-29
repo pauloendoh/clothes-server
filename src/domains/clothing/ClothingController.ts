@@ -1,15 +1,18 @@
 import { User } from "@prisma/client";
 import {
+  Body,
   CurrentUser,
   Delete,
   Get,
   JsonController,
   Param,
   Post,
+  Put,
   UploadedFile,
 } from "routing-controllers";
 import { multerConfig } from "../../utils/multerConfig";
 import { ClothingService } from "./ClothingService";
+import { ClothingPutDto } from "./types/ClothingPutDto";
 
 @JsonController("/clothings")
 export class ClothingController {
@@ -25,6 +28,15 @@ export class ClothingController {
     @UploadedFile("image", { options: multerConfig }) file: any
   ) {
     return this.clothingService.createClothing(user.id, file.filename);
+  }
+
+  @Put("/:id")
+  updateClothing(
+    @CurrentUser({ required: true }) user: User,
+    @Param("id") clothingId: number,
+    @Body() body: ClothingPutDto
+  ) {
+    return this.clothingService.updateClothing(user.id, clothingId, body);
   }
 
   @Delete("/:id")
