@@ -14,11 +14,12 @@ const localDiskStorage = diskStorage({
     // garantir que os nomes não se sobreponham
     // usa-se um hash
     randomBytes(16, (err, hash) => {
-      if (err) throw err;
-
       console.log({
         IS_S3_STORAGE: process.env.IS_S3_STORAGE,
       });
+
+      if (err) throw err;
+
       const filename = `${hash.toString("hex")}-${file.originalname}`;
 
       cb(null, filename);
@@ -49,7 +50,6 @@ const s3Storage = multerS3({
 });
 
 export const multerConfig: multer.Options = {
-  dest: path.resolve(UPLOAD_PATH),
   storage: process.env.IS_S3_STORAGE === "true" ? s3Storage : localDiskStorage,
   limits: {
     fileSize: 10 * 1024 * 1024,
