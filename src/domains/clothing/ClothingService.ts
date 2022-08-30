@@ -1,10 +1,11 @@
 import { unlink } from "fs";
 import { BadRequestError, ForbiddenError } from "routing-controllers";
-import { getSrcPath } from "../../getSrcPath";
 import { getPublicUploadsPath } from "../../utils/getPublicUploadsPath";
 import { urls } from "../../utils/urls";
 import { ClothingRepository } from "./ClothingRepository";
+import { AwsFileDto } from "./types/AwsFileDto";
 import { ClothingPutDto } from "./types/ClothingPutDto";
+import { MulterFileDto } from "./types/MulterFileDto";
 
 export class ClothingService {
   constructor(private clothingRepo = new ClothingRepository()) {}
@@ -13,10 +14,11 @@ export class ClothingService {
     return this.clothingRepo.findUserClothings(userId);
   }
 
-  createClothing = async (userId: number, imgUrl: string) => {
-    if (!imgUrl.includes("http")) {
-      imgUrl = urls.publicUploads(imgUrl);
-    }
+  createClothing = async (userId: number, file: MulterFileDto | AwsFileDto) => {
+    let imgUrl = "";
+
+    if ("location" in file) imgUrl = file.location;
+    else if ("filename" in file) imgUrl = urls.publicUploads(file.filename);
 
     return this.clothingRepo.createClothing(userId, imgUrl);
   };
@@ -50,9 +52,7 @@ export class ClothingService {
         "Clothing not found or user does not have access."
       );
 
-    const srcPath = getSrcPath();
-
-    if (process.env.IS_DISK_STORAGE === "true") {
+    if (process.env.IS_S3_STORAGE === "false") {
       const splits = found.imgUrl.split("/");
       const imgName = splits[splits.length - 1];
       unlink(getPublicUploadsPath() + imgName, (err) => {

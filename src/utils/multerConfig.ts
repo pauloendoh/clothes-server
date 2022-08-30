@@ -1,5 +1,7 @@
+import { S3Client } from "@aws-sdk/client-s3";
 import { randomBytes } from "crypto";
 import multer, { diskStorage } from "multer";
+import multerS3 from "multer-s3";
 import path from "path";
 
 const UPLOAD_PATH = path.resolve(__dirname, "../../public/uploads");
@@ -21,11 +23,31 @@ const localDiskStorage = diskStorage({
   },
 });
 
+const s3 = new S3Client({
+  region: process.env.AWS_DEFAULT_REGION,
+});
+
+const s3Storage = multerS3({
+  s3: s3,
+  bucket: "endoh",
+  contentType: multerS3.AUTO_CONTENT_TYPE,
+  acl: "public-read", // permissão
+  key: (req, file, cb) => {
+    // garantir que os nomes não se sobreponham
+    // usa-se um hash
+    randomBytes(16, (err, hash) => {
+      if (err) throw err;
+
+      const fileName = `${hash.toString("hex")}-${file.originalname}`;
+
+      cb(null, fileName);
+    });
+  },
+});
+
 export const multerConfig: multer.Options = {
   dest: path.resolve(UPLOAD_PATH),
-  storage: Boolean(process.env.IS_DISK_STORAGE)
-    ? localDiskStorage
-    : localDiskStorage,
+  storage: process.env.IS_S3_STORAGE === "true" ? s3Storage : localDiskStorage,
   limits: {
     fileSize: 10 * 1024 * 1024,
   },

@@ -12,7 +12,9 @@ import {
 } from "routing-controllers";
 import { multerConfig } from "../../utils/multerConfig";
 import { ClothingService } from "./ClothingService";
+import { AwsFileDto } from "./types/AwsFileDto";
 import { ClothingPutDto } from "./types/ClothingPutDto";
+import { MulterFileDto } from "./types/MulterFileDto";
 
 @JsonController("/clothings")
 export class ClothingController {
@@ -25,9 +27,10 @@ export class ClothingController {
   @Post()
   createClothing(
     @CurrentUser({ required: true }) user: User,
-    @UploadedFile("image", { options: multerConfig }) file: any
+    @UploadedFile("image", { options: multerConfig })
+    file: AwsFileDto | MulterFileDto
   ) {
-    return this.clothingService.createClothing(user.id, file.filename);
+    return this.clothingService.createClothing(user.id, file);
   }
 
   @Put("/:id")
