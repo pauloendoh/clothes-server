@@ -1,4 +1,4 @@
-import { myPrismaClient } from "../../utils/myPrismaClient";
+import myPrismaClient from "../../utils/myPrismaClient";
 
 export class TagRepository {
   constructor(private prismaClient = myPrismaClient) {}

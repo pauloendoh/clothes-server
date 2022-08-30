@@ -1,4 +1,4 @@
-import { myPrismaClient } from "../../utils/myPrismaClient";
+import myPrismaClient from "../../utils/myPrismaClient";
 import { ClothingPutDto } from "./types/ClothingPutDto";
 
 export class ClothingRepository {

@@ -3,7 +3,7 @@ import { compare, genSalt, hash } from "bcrypt";
 import { config } from "dotenv";
 import { sign } from "jsonwebtoken";
 import { BadRequestError, NotFoundError } from "routing-controllers";
-import { myPrismaClient } from "../../utils/myPrismaClient";
+import myPrismaClient from "../../utils/myPrismaClient";
 import { AuthRepository } from "./AuthRepository";
 import { AuthUserGetDto } from "./types/AuthUserGetDto";
 import { LoginDto } from "./types/LoginDto";

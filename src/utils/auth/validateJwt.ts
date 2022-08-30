@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import { config } from "dotenv";
 import { verify } from "jsonwebtoken";
 import { UnauthorizedError } from "routing-controllers";
-import { myPrismaClient } from "../myPrismaClient";
+import myPrismaClient from "../myPrismaClient";
 config();
 
 export const validateJwt = (token: string) => {
