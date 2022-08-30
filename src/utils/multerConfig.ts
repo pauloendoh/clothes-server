@@ -16,6 +16,9 @@ const localDiskStorage = diskStorage({
     randomBytes(16, (err, hash) => {
       if (err) throw err;
 
+      console.log({
+        IS_S3_STORAGE: process.env.IS_S3_STORAGE,
+      });
       const filename = `${hash.toString("hex")}-${file.originalname}`;
 
       cb(null, filename);
